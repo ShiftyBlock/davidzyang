@@ -770,9 +770,10 @@
         let mouse = { x: null, y: null, radius: 150 };
         let isAttracting = false;
 
-        const nodeCount = 150; // Can handle more nodes now!
+        const nodeCount = 150;
         const connectionDistance = 120;
-        const cellSize = connectionDistance; // Grid cell = connection range
+        const cellSize = connectionDistance;
+        const maxConnectionsPerNode = 6; // Cap edges per node for O(n * min(k, maxConn))
         const nodeColors = ['#d4c6e7', '#f2d7d9', '#b8d4e3', '#fce5d8', '#c9e4de'];
 
         let gridCols, gridRows;
@@ -852,9 +853,6 @@
             // Build spatial hash once per frame - O(n)
             buildSpatialHash();
 
-            // Track drawn connections to avoid duplicates
-            const drawnConnections = new Set();
-
             // Update and draw nodes
             for (let i = 0; i < nodes.length; i++) {
                 const node = nodes[i];
@@ -893,27 +891,37 @@
                 node.x = Math.max(0, Math.min(width, node.x));
                 node.y = Math.max(0, Math.min(height, node.y));
 
-                // Draw connections only to nearby nodes - O(k) instead of O(n)
+                // Draw connections only to nearby nodes - O(min(k, maxConn))
                 const neighbors = getNeighborIndices(node);
-                for (const j of neighbors) {
-                    if (j <= i) continue; // Avoid duplicate connections
+                const connDistSq = connectionDistance * connectionDistance;
 
+                // Collect valid neighbors with distances
+                const validNeighbors = [];
+                for (const j of neighbors) {
+                    if (j <= i) continue;
                     const other = nodes[j];
                     const dx = node.x - other.x;
                     const dy = node.y - other.y;
                     const distSq = dx * dx + dy * dy;
-                    const connDistSq = connectionDistance * connectionDistance;
-
                     if (distSq < connDistSq) {
-                        const dist = Math.sqrt(distSq);
-                        const opacity = (1 - dist / connectionDistance) * 0.3;
-                        ctx.beginPath();
-                        ctx.strokeStyle = `rgba(212, 198, 231, ${opacity})`;
-                        ctx.lineWidth = 1;
-                        ctx.moveTo(node.x, node.y);
-                        ctx.lineTo(other.x, other.y);
-                        ctx.stroke();
+                        validNeighbors.push({ j, distSq });
                     }
+                }
+
+                // Sort by distance and take closest maxConnectionsPerNode
+                validNeighbors.sort((a, b) => a.distSq - b.distSq);
+                const toConnect = validNeighbors.slice(0, maxConnectionsPerNode);
+
+                for (const { j, distSq } of toConnect) {
+                    const other = nodes[j];
+                    const dist = Math.sqrt(distSq);
+                    const opacity = (1 - dist / connectionDistance) * 0.3;
+                    ctx.beginPath();
+                    ctx.strokeStyle = `rgba(212, 198, 231, ${opacity})`;
+                    ctx.lineWidth = 1;
+                    ctx.moveTo(node.x, node.y);
+                    ctx.lineTo(other.x, other.y);
+                    ctx.stroke();
                 }
 
                 // Draw node
@@ -923,7 +931,6 @@
                 ctx.fill();
             }
 
-           
             requestAnimationFrame(animate);
         }
 
