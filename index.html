@@ -867,10 +867,7 @@
                 ctx.fill();
             });
 
-            // Limit max nodes for performance
-            if (nodes.length > 300) {
-                nodes = nodes.slice(-300);
-            }
+        
 
             requestAnimationFrame(animate);
         }
