@@ -1,453 +1,429 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
-
-<html>
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>David Z. Yang</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<title>David Z. Yang</title>
+        :root {
+            --pastel-blue: #b8d4e3;
+            --pastel-pink: #f2d7d9;
+            --pastel-lavender: #d4c6e7;
+            --pastel-peach: #fce5d8;
+            --pastel-mint: #c9e4de;
+            --soft-white: #fafbfc;
+            --text-dark: #2d3436;
+            --text-light: #636e72;
+        }
 
-<script type="text/javascript">
-  function unhide(divID) {
-    var item = document.getElementById(divID);
-    if (item) {
-      item.className=(item.className=='hidden')?'unhidden':'hidden';
-    }
-  }
-</script>
+        html {
+            scroll-behavior: smooth;
+        }
 
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--soft-white);
+            color: var(--text-dark);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
 
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 24px 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: rgba(250, 251, 252, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
 
-<link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,400,300,700,600' rel='stylesheet' type='text/css'>
+        .logo {
+            font-weight: 500;
+            font-size: 18px;
+            letter-spacing: -0.5px;
+        }
 
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
 
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-light);
+            font-size: 14px;
+            font-weight: 400;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-dark);
+        }
+
+        /* Sections */
+        section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 120px 48px;
+            position: relative;
+        }
+
+        .section-content {
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .section-label {
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-light);
+            margin-bottom: 24px;
+        }
+
+        h1 {
+            font-size: clamp(48px, 8vw, 80px);
+            font-weight: 300;
+            letter-spacing: -2px;
+            line-height: 1.1;
+            margin-bottom: 32px;
+        }
+
+        h2 {
+            font-size: clamp(36px, 5vw, 56px);
+            font-weight: 300;
+            letter-spacing: -1px;
+            line-height: 1.2;
+            margin-bottom: 24px;
+        }
+
+        p {
+            font-size: 18px;
+            color: var(--text-light);
+            font-weight: 300;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .highlight {
+            color: var(--text-dark);
+            font-weight: 400;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(180deg, var(--pastel-blue) 0%, var(--soft-white) 100%);
+        }
+
+        .hero h1 span {
+            display: block;
+        }
+
+        .wave {
+            display: inline-block;
+            animation: wave 2.5s infinite;
+            transform-origin: 70% 70%;
+        }
+
+        @keyframes wave {
+            0%, 100% { transform: rotate(0deg); }
+            10% { transform: rotate(14deg); }
+            20% { transform: rotate(-8deg); }
+            30% { transform: rotate(14deg); }
+            40% { transform: rotate(-4deg); }
+            50% { transform: rotate(10deg); }
+            60%, 100% { transform: rotate(0deg); }
+        }
+
+        /* Dance Section */
+        .dance {
+            background: linear-gradient(180deg, var(--soft-white) 0%, var(--pastel-pink) 50%, var(--soft-white) 100%);
+        }
+
+        /* Cooking Section */
+        .cooking {
+            background: linear-gradient(180deg, var(--soft-white) 0%, var(--pastel-peach) 50%, var(--soft-white) 100%);
+        }
+
+        /* BTS Section */
+        .bts {
+            background: linear-gradient(180deg, var(--soft-white) 0%, var(--pastel-lavender) 50%, var(--soft-white) 100%);
+        }
+
+        /* Solo Trips Section */
+        .trips {
+            background: linear-gradient(180deg, var(--soft-white) 0%, var(--pastel-mint) 50%, var(--soft-white) 100%);
+        }
+
+        /* Teaching Section */
+        .teaching {
+            background: linear-gradient(180deg, var(--soft-white) 0%, var(--pastel-blue) 50%, var(--soft-white) 100%);
+        }
+
+        /* Contact Section */
+        .contact {
+            background: var(--soft-white);
+            min-height: 60vh;
+        }
+
+        .contact a {
+            color: var(--text-dark);
+            text-decoration: none;
+            border-bottom: 1px solid var(--text-light);
+            transition: border-color 0.3s ease;
+        }
+
+        .contact a:hover {
+            border-color: var(--text-dark);
+        }
+
+        /* Fun details */
+        .aside {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-top: 32px;
+            font-style: italic;
+        }
+
+        /* Parallax floating elements */
+        .float-element {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .float-1 {
+            width: 300px;
+            height: 300px;
+            background: var(--pastel-pink);
+            top: 20%;
+            left: -100px;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .float-2 {
+            width: 200px;
+            height: 200px;
+            background: var(--pastel-lavender);
+            bottom: 20%;
+            right: -50px;
+            animation: float 6s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-30px); }
+        }
+
+        /* Scroll indicator */
+        .scroll-hint {
+            position: absolute;
+            bottom: 48px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-light);
+            font-size: 12px;
+        }
+
+        .scroll-hint::after {
+            content: '';
+            width: 1px;
+            height: 40px;
+            background: linear-gradient(to bottom, var(--text-light), transparent);
+            animation: scrollPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes scrollPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            nav {
+                padding: 16px 24px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            section {
+                padding: 80px 24px;
+            }
+
+            p {
+                font-size: 16px;
+            }
+        }
+
+        /* Fade in animation */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
 </head>
-<style>
-  body {font-family:  'Open Sans', sans-serif;
-          letter-spacing:1px;
-          text-align:left;
-          font-weight: 300;
-          color: #000000;
-          background-color:#ffffff;}
-          
-table {border:0px;
-       padding:0px 10px;
-       margin:0px;
-       text-align:left;}
-
-td    {font-family: 'Open Sans', sans-serif;
-       vertical-align:top;
-       padding-top:7px;
-       font-size:12px;}
-          
-a     { font-family: 'Open Sans', sans-serif;
-         text-decoration:none;
-         font-weight: 400;
-         color:#004488;}
-         
-h3    {position:relative;
-        font-family: 'Open Sans', sans-serif;
-        font-size:16px;
-        font-weight: 300;
-        margin-bottom:10px;
-        margin-top:30px;
-        color: #000000;}        
-        
-h4    {position:relative;
-       font-family: 'Open Sans', sans-serif;
-       font-size:14px;
-       font-weight: 300;
-       margin-bottom:0px;
-       padding: 0px 10px;
-       color: #336699;}       
-        
-p     {font-size:13px;
-        font-family: 'Open Sans', sans-serif;
- 
-      
-        margin:5px;
-        padding:0px 10px;}
-          
-div   {position:relative;
-         border:0px;
-         margin:0px;
-         padding:0px;}
-
-div#central {width:775px;
-         margin-left: auto;
-  margin-right: auto;}
-  
-div#header  {border-bottom: 1px solid #bbbbbb;
-          overflow:auto;
-          padding:5px;
-          padding-top:15px;}     
-          
-div#navigation {position:relative;
-                float:left;
-                width:190px;
-                text-align:left;
-                padding-top:30px;
-                padding-right:2px;
-                padding-left:2px;}           
-                  
-div#main {float: right;
-              min-height:400px; 
-              height:auto !important; 
-              height:400px; 
-              width: 559px;
-              padding-left:20px;
-              padding-right:2px;
-              text-aling:left;}     
-              
-div#lower    {float:left;
-              font-size:10px;
-              font-family: 'Open Sans', sans-serif;
-              width:765px;
-              border-top:1px solid #bbbbbb;
-       padding:2px 5px;
-       margin: 30px 0px;
-              color:#333333;
-              overflow:visible;
-              height:50px;}
-              
-div.section{ width:559px;}
-                            
-div.navtitle {font-family: 'Open Sans', sans-serif;
-       margin-bottom:5px;
-              margin-top:10px;
-              padding:2px;
-              padding-left:4px;
-              border-bottom:1px solid #999999;         
-              font-size:11px;
-              font-weight: 400;
-              color: #004488;}
-
-div.navtitle a { color:#004488;
-                 font-weight: 400;}                       
-                            
-div.navtitle a:hover {color: #dd6600;  }               
-              
-div.navinfo { font-family: 'Open Sans', sans-serif;
-              padding:2px;
-              padding-left:4px;
-              font-size:11px;
-              font-weight: 400;
-              line-height:14px;}        
-
-div.navinfo a {color:#000000;}
-
-div.navinfo a:hover {color: #dd6600; }
-
-.hidden { display: none; }
-.unhidden { display: block; }
-
-p.space {
-  padding-left:30px;
-  padding-bottom:10px;
-  margin-top:1.5px;
-  font-size:11px;
-}
-p.a{
-  font-weight:600;
-}
-p.b{
-  font-weight:300;
-  padding-left:30px;
-  padding-bottom:0px;
-  margin-top:-3px;
-  font-size:11px
-}
-</style>
-
 <body>
-<!--
--->
-
-<div id="central" style="background-color:#ffffff;">
-
-<!-- Begin Header -->
-
-<div id="header">
-  
-<div style="float:left;">
-      
-<div style="font-family: 'Open Sans'; font-size:24px;font-weight:300; font-stretch: normal; font-style:normal;font-variant:normal; padding-left:2px;padding-top:0px;margin-bottom:0px;">David Z. Yang</div>
-      
-
-   
-</div>
-   
-<!-- <div style="float:right;margin-left:20px;"><img src="stockholmuniversity.jpg" width="55px"></div> -->
-
-
-</div>
-
-<!-- End Header-->
-<!-- Begin Navigation -->
-
-<div id="navigation">
-
-
-<div style="margin:3px;">
-  <!-- image -->
-<img src="\david.jpg" width=180>
-</div>
-
-
-<div class="navtitle"><a href="/DavidYangResume.pdf" target="_blank">Resume</a></div>
-
- 
-<div class="navtitle">Contact Information</div>
- <div class="navinfo">
-   <a href="mailto:david@davidzyang.com">david@davidzyang.com</a><br/>
-</div>
-
- 
-<div class="navtitle">Bio</div>
- 
-<div class="navinfo">
-  USACO Platinum<br/>
-  USACO Problemsetter<br/>
-  A.S in Computer Science <br/>
-  A.S in Math & Physics '23
-</div>
-
-<div class="navtitle">Personal Statement</div>
- <div class="navinfo">
-   Climbing brought me outside and into the world. My most memorable moment was at school, when I climbed up the pillars in the quad. I&#8217;m not sure what my motivations were, but I wanted to climb the 10 foot tall pillar. I reached the top, enjoyed the view and the peace. Until suddenly a wave of clapping started, roaring louder and louder. I&#8217;ve had my share of public moments - speaking out against bullying in 6th grade, running for president in 9th, but this was different. A grassroots clapping movement to cheer me on. I&#8217;ll never forget that.
-<br/>
-</div>
-
-<!--
-<div class="navtitle">Presentations</div>
- 
-<div class="navinfo">
-
-<table width="100%" style="border:0;border-collapse: collapse;margin: 0px;padding: 0px";
-
-<tr>
-<td style="text-align:left;font-size:11px" width="35%">2nd Oct</td><td style="text-align:left;font-size:11px" width="65%">NHH, Bergen</td>
-</tr>
-
-</table>
-
-</div>
- 
--->
-</div>
-
-
-<!-- End Navigation -->
-
-
-<!-- Begin Main --> 
-
-
-<div id="main"> 
-
-<div class="section"> 
-
-<h3>Education</h3> 
-<p class = "a">University of California, Berkeley (Fall 2023 - Spring 2027)</p> 
-<p class = "b">B.S in Electrical and Computer Science </p> 
-<p class = "b">B.S in Industrial Engineering and Operations Research</p> 
-<p class = "b">Cool Math: <a href="https://eecs70.org">Discrete Mathematics and Probability Theory</a>, <a href = "https://inst.eecs.berkeley.edu/~ee126/sp24/">Probability and Random Processes</a>, Introduction to Stochastic Processes</p> 
-<p class = "b"> Cool CS: <a href = "https://cs170.org">Algorithms</a>, Machine Learning, CS61A/B </p>
-<p class = "b"> Activities: Cal Table Tennis Officer, Poker at Berkeley Member, IISE Member, Tau Beta Pi Candidate </p>
-
-
-<p class = "a">College of San Mateo (Fall 2019 - Spring 2023)</p> 
-<p class = "b">A.S in Computer Science (Fall 2022)</p> 
-<p class = "b">A.S-Transfer in Mathematics & Computer Science & Physics (Spring 2023)</p> 
-<p class = "b">Cool Math: Discrete Math, Calculus 3, Linear Algebra, Differential Equations</p> 
-<p class = "b">Cool CS: Intro to CS 1 & 2, Data Structures & Algorithms, Computer Systems</p> 
-<p class = "space">
-
-<p class="a">San Mateo High School (Fall 2019 - Spring 2023)</p> 
-<p class = "b">High School Diploma</p> 
-<p class = "b">AP Calculus BC, AP Physics 1, AP CS A, AP Chinese, AP French, AP English Language</p> 
-
-</div>
-
-<div class="section"> 
-
-<h3>Work Experience</h3> 
-<p class="a">Incoming Algorithms and AI Software Development Intern (2024)</p> 
-<p class ="b">Genetic Sciences Division, Thermo Fisher Scientific</p>
-<p class="a">NLP Student Research Assistant (Spring 2022 - Fall 2022)</p>
-<p class = "b">Yale Cardiovascular Data Science Lab <a href="https://www.cards-lab.org/">(CarDS)</a></p>
-<p class = "b"> Developed a full-stack federated-learning demo tool for hospitals in Japan and US. Orchestrated the seamless integration of Yale AWS instances and databases, delivering substantial 2x efficiency of query intialization.
-
-</p>
-<p class = "b">Spearheaded Yale-OHDSI by incorporating hierarchical administrative access and learning the Athena vocabulary for hosting the OHDSI SQL generation tool.</p>
-<p class = "b">Deployed a federated BOW spaCy model for classifying patient features (Age, Gender, Risk) based on hospital texts, achieving 0.99 binary AUC and 0.87 macro-F on 77 categorical age labels. Presented model at lab meeting.</p>
-<p class ="a">
-  Autonomous Cognitive Assistants Software Developer (Summer 2022)
-</p>
-<p class = "b">
-  Beaver Works Summer Institute, MIT Lincoln Laboratory
-</p>
-<p class = "b">
-  Learned from Anthropic MLE Ryan Soklaski, who guided designing our own auto-differentiation package.
-</p>
-<p class = "b">
-  Led 3 team-based AI capstones: FaceID with Facenet and Whispers clustering, fine-tuning food-recognition on YoloV7 and Detectron2, and semantic search, weighted inverse document frequency image-query engine from text.
-  </p>
-<p class="a">CEO and Algorithms Director(2020 - 2022)</p> 
-<p class = "b"> USACO Tutor </p> 
-<p class = "b">Managed a team of tutors teaching multiple 1:1 weekly classes for USACO competitions</p>  
-<p class = "b">Prepared classes in algorithms and competitive programming for 30+ students</p>  
-<p class = "b">Optimized SEO to achieve #1 on Google & Designed a Learning Management System</p>  
-<p class = "space">
-<p class="a">Student Council President  (2019 - 2020)</p> 
-<p class = "b">San Mateo High School</p> 
-<p class = "b">Reach out to community leaders and companies to promote fundraising and community</p>  
-<p class = "b">Started the <a href= "https://www.change.org/p/shift-our-san-mateo-county-schools-to-online-classes-before-it-s-too-late" target = "_blank"> petition </a>to close SM schools due to COVID, gathering 5500+ signatures</p> 
-
-</div>
-
-<div class="section"> 
-
-<h3>Research</h3> 
-
-<p style="font-weight:600">AFP and CEA Viability as EOC Biomarkers [2nd Place]</p>
-<p style="padding-left:30px;padding-bottom:0px;margin-top:-3px;font-size:11px">David Z. Yang</p>
-<p style="padding-left:30px;padding-bottom:0px;margin-top:-1px;font-size:11px;">
-
-<a href="javascript:unhide('abstract_misperception');">[Show/hide abstract]</a>
-<br>
-
-<a href="https://angio.davidzyang.com" target="_blank">[AntiAngio]</a> <a href="https://docs.google.com/viewerng/viewer?url=https://storage.googleapis.com/shiftybuild.appspot.com/nUmpmHeNpJ.pdf" target="_blank">[Presentation]</a> 
-
-    <div id="abstract_misperception" class="hidden">
-    <p style="padding-left:30px;padding-bottom:10px;margin-top:0px;font-size:11px;">
-    Women have a 1.3% chance in their lifetime of developing ovarian cancer. Out of 1000 women, 13 of them will develop malignant cancers, of which will likely be high-grade serous carcinomas, a subtype of epithelial ovarian carcinomas, which rapidly metastasize (spread) and evolve into stage 3 and 4. Ovarian cancer has one of the highest death rates of all female cancers - disproportionally contributing 5% of female cancer deaths despite only making up 2.5% of female cancers. Ovarian cancer is difficult to diagnose early, and given the name "the silent killer", because many of the current screening methods are unable to detect traces of ovarian cancer. Rather, only when the cancer has metastasized to different parts of the body, and in Stage 4, spread to unrelated places such as the lungs, breast, and brain, that current screening methods are able to pick up on the malignancy of the cancer. In our study, we analyzed different features, decided on AFP, CEA, CA125, HE4 as key features, and decided on Mean Imputation. 5-fold cross validation was implemented to prevent overfitting. My model increases sensitivity and specificity to both 89/90%.
-
-    </p>
-    </div>
-
-
-  <p style="font-weight:600">Disease-associated Microbiome Interaction Identification [In Progress]</p>
-
-<p style="padding-left:30px;padding-bottom:0px;margin-top:-3px;font-size:11px">David Z. Yang, Advisor: Dr. Erliang Zeng</p>
-<p style="padding-left:30px;padding-bottom:0px;margin-top:-1px;font-size:11px;">
-
-<a href="javascript:unhide('abstract_misperception2');">[Show/hide abstract]</a>
-<br>
-
-
-    <div id="abstract_misperception2" class="hidden">
-    <p style="padding-left:30px;padding-bottom:10px;margin-top:0px;font-size:11px;">
-    
-
-
-    </p>
-    </div>
-</div> 
-
-<div class="section"> 
-<h3>Awards</h3> 
-
-<p style="font-weight:600">USACO Platinum (Top 2% of High Schoolers)</p>
-<p style="padding-left:30px;padding-bottom:0px;margin-top:-3px;font-size:11px">2020
-<a href="http://usaco.org/current/data/dec20_gold_results.html">Promotion List</a></p>
-<p class = "space">
-<p style="font-weight:600">USACO Problem Writer</p>
-<p style="padding-left:30px;padding-bottom:0px;margin-top:-3px;font-size:11px">2021
-<a href="http://usaco.org/index.php?page=viewproblem2&cpid=1111">[Year of the Cow]</a>
-</p>
-<p class = "space">
-<p style="font-weight:600">Facebook Hackercup T-Shirt Winner (Top 1500)</p>
-<p style="padding-left:30px;padding-bottom:0px;margin-top:-3px;font-size:11px">2021-2022 
-</p>
-<p class = "space">
-<p style="font-weight:600">SM County Poetry Out Loud</p>
-<p style="padding-left:30px;padding-bottom:0px;margin-top:-3px;font-size:11px">2019-2020</p>
-<p style="padding-left:30px;padding-bottom:0px;margin-top:-3px;font-size:11px">Winner of the county competition and competed at the state</p>
-
-</div>
-
-<div class="section"> 
-
- <h3>Enrichment (Mostly in progress)</h3> 
-
-<p class = "a">Data Mining CS246</p>
-<p class = "b">Stanford</p>
-<p style="padding-left:30px;padding-bottom:0px;margin-top:-3px;font-size:11px">Notes: 
-<a href="https://storage.googleapis.com/shiftybuild.appspot.com/2WiWzioAMo.pdf">Apriori and Park-Chen-Yu</a></p>
-<p class = "a">Machine Learning CS229</p>
-<p class = "b"> Stanford </p>
-<p class = "a">Machine Learning CS231N</p>
-<p class = "b"> Stanford</p>
-<p class = "a">DeepLearning.AI Neural Networks</p>
-<p class = "b">Andrew Ng</p>
-
-<p class = "a">Computational Genomics with R</p>
-<p style="padding-left:30px;padding-bottom:0px;margin-top:-3px;font-size:11px">Book
-<a href="http://compgenomr.github.io/book/">Link</a></p>
-
-
-
-
-</div>
-
-
-
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-<!--End Main --> 
-
-<div id="lower">
- <div style="float:right;">
-<!-- 
- Site template &copy; Konrad B. Burchardi -->
- <p style="font-size:10px;"> Site template &copy; <a href="http://people.su.se/~kburc/" target="_blank">Konrad B. Burchardi</a></p>
- </div>
-</div>
-
-
-</div>
-
-
-
-
-
-</div> 
-
-</div>
-
-
-<!-- Start of StatCounter Code for Default Guide -->
-<!-- Start of StatCounter Code for Default Guide -->
-<script type="text/javascript">
-var sc_project=10650730;
-var sc_invisible=1;
-var sc_security="d6efb63f";
-var scJsHost = (("https:" == document.location.protocol) ?
-"https://secure." : "http://www.");
-document.write("<sc"+"ript type='text/javascript' src='" +
-scJsHost+
-"statcounter.com/counter/counter.js'></"+"script>");
-</script>
-<noscript><div class="statcounter"><a title="site stats" href="http://statcounter.com/free-web-stats/" target="_blank"><img class="statcounter" src="http://c.statcounter.com/10650730/0/d6efb63f/1/" alt="site stats"></a></div></noscript>
-
-<!-- End of StatCounter Code for Default Guide -->
-
-
+    <nav>
+        <div class="logo">david z. yang</div>
+        <ul class="nav-links">
+            <li><a href="#dance">dance</a></li>
+            <li><a href="#cooking">cooking</a></li>
+            <li><a href="#bts">bts</a></li>
+            <li><a href="#trips">trips</a></li>
+            <li><a href="#teaching">teaching</a></li>
+            <li><a href="#contact">say hi</a></li>
+        </ul>
+    </nav>
+
+    <section class="hero">
+        <div class="float-element float-1"></div>
+        <div class="float-element float-2"></div>
+        <div class="section-content fade-in">
+            <h1>
+                <span>hi, i'm david</span>
+                <span class="wave">👋</span>
+            </h1>
+            <p>
+                i like to make things, learn things, and occasionally go places by myself.
+                welcome to my little corner—stick around if you'd like.
+            </p>
+        </div>
+        <div class="scroll-hint">scroll</div>
+    </section>
+
+    <section class="dance" id="dance">
+        <div class="section-content fade-in">
+            <div class="section-label">movement</div>
+            <h2>i wanted to see if i could dance</h2>
+            <p>
+                so i joined a training club. turns out you don't need to be good before you start—you just need to <span class="highlight">start</span>.
+                now i move a little better than before, and that feels like enough.
+            </p>
+            <p class="aside">still learning. always learning.</p>
+        </div>
+    </section>
+
+    <section class="cooking" id="cooking">
+        <div class="section-content fade-in">
+            <div class="section-label">kitchen</div>
+            <h2>i bake bread and sometimes get ambitious</h2>
+            <p>
+                there was a bread phase. there was a beef wellington. there was a prime rib that turned out <span class="highlight">really well</span> actually.
+                cooking is just chemistry you get to eat.
+            </p>
+            <p class="aside">the bread journey is documented somewhere.</p>
+        </div>
+    </section>
+
+    <section class="bts" id="bts">
+        <div class="section-content fade-in">
+            <div class="section-label">comfort</div>
+            <h2>v feels like a warm hug</h2>
+            <p>
+                it started with euphoria playing on shuffle—that dreamy pastel cover art.
+                then permission to dance. then everything else.
+                now i have a photobook and <span class="highlight">zero regrets</span>.
+            </p>
+            <p class="aside">layover on repeat. always.</p>
+        </div>
+    </section>
+
+    <section class="trips" id="trips">
+        <div class="section-content fade-in">
+            <div class="section-label">solo</div>
+            <h2>sometimes i just go places alone</h2>
+            <p>
+                myrtle beach with a photobook. a j-hope concert when my friends couldn't make it.
+                there's something nice about <span class="highlight">following what you love</span>, even if no one else is coming.
+            </p>
+            <p class="aside">good company: me, myself, and whatever i'm listening to.</p>
+        </div>
+    </section>
+
+    <section class="teaching" id="teaching">
+        <div class="section-content fade-in">
+            <div class="section-label">sharing</div>
+            <h2>i like helping people get it</h2>
+            <p>
+                whether it's algorithms, code, or just figuring something out together.
+                the moment something <span class="highlight">clicks</span> for someone? that's the good stuff.
+            </p>
+            <p class="aside">usaco platinum. problemsetter. occasional explainer of things.</p>
+        </div>
+    </section>
+
+    <section class="contact" id="contact">
+        <div class="section-content fade-in">
+            <div class="section-label">connect</div>
+            <h2>want to say hi?</h2>
+            <p>
+                i'm always happy to chat about code, cooking, bts theories, or anything else really.
+                <br><br>
+                <a href="mailto:david@davidzyang.com">david@davidzyang.com</a>
+            </p>
+        </div>
+    </section>
+
+    <script>
+        // Intersection Observer for fade-in animations
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Subtle parallax effect on scroll
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            document.querySelectorAll('.float-element').forEach(el => {
+                const speed = 0.5;
+                el.style.transform = `translateY(${scrolled * speed}px)`;
+            });
+        });
+    </script>
 </body>
-
 </html>
