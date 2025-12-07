@@ -765,6 +765,7 @@
         let width, height;
         let nodes = [];
         let mouse = { x: null, y: null, radius: 150 };
+        let isAttracting = false; // Shift or right-click to attract
 
         const nodeCount = 80;
         const connectionDistance = 120;
@@ -789,21 +790,37 @@
             }
         }
 
+        function spawnNodes(x, y, count = 5) {
+            for (let i = 0; i < count; i++) {
+                const angle = (Math.PI * 2 / count) * i;
+                const speed = 2 + Math.random() * 2;
+                nodes.push({
+                    x: x,
+                    y: y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    radius: Math.random() * 2 + 1,
+                    color: nodeColors[Math.floor(Math.random() * nodeColors.length)]
+                });
+            }
+        }
+
         function animate() {
             ctx.clearRect(0, 0, width, height);
 
             // Update and draw nodes
             nodes.forEach((node, i) => {
-                // Mouse interaction - push nodes away
+                // Mouse interaction - repel or attract
                 if (mouse.x && mouse.y) {
                     const dx = node.x - mouse.x;
                     const dy = node.y - mouse.y;
                     const dist = Math.sqrt(dx * dx + dy * dy);
 
-                    if (dist < mouse.radius) {
+                    if (dist < mouse.radius && dist > 0) {
                         const force = (mouse.radius - dist) / mouse.radius;
-                        node.vx += (dx / dist) * force * 0.5;
-                        node.vy += (dy / dist) * force * 0.5;
+                        const direction = isAttracting ? -1 : 1; // -1 attracts, 1 repels
+                        node.vx += (dx / dist) * force * 0.5 * direction;
+                        node.vy += (dy / dist) * force * 0.5 * direction;
                     }
                 }
 
@@ -850,6 +867,11 @@
                 ctx.fill();
             });
 
+            // Limit max nodes for performance
+            if (nodes.length > 300) {
+                nodes = nodes.slice(-300);
+            }
+
             requestAnimationFrame(animate);
         }
 
@@ -862,6 +884,41 @@
         canvas.addEventListener('mouseleave', () => {
             mouse.x = null;
             mouse.y = null;
+        });
+
+        // Click to spawn nodes
+        canvas.addEventListener('click', (e) => {
+            spawnNodes(e.clientX, e.clientY, 5);
+        });
+
+        // Right-click to attract (prevent context menu)
+        canvas.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+
+        canvas.addEventListener('mousedown', (e) => {
+            if (e.button === 2) { // Right click
+                isAttracting = true;
+            }
+        });
+
+        canvas.addEventListener('mouseup', (e) => {
+            if (e.button === 2) {
+                isAttracting = false;
+            }
+        });
+
+        // Shift key to attract
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Shift') {
+                isAttracting = true;
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'Shift') {
+                isAttracting = false;
+            }
         });
 
         // Initialize
