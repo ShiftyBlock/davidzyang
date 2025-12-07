@@ -775,9 +775,8 @@
         const cellSize = connectionDistance;
         const maxConnectionsPerNode = 6;
         const nodeColors = ['#d4c6e7', '#f2d7d9', '#b8d4e3', '#fce5d8', '#c9e4de'];
-        const flowStrength = 0.008; // Gentle pull, not gorilla gelatin
-        let currentSpacing = 10; // Start sparse, gets denser as particles added
-        const minSpacing = 4; // Maximum density
+        const flowStrength = 0.001; // Very gentle pull
+        const textSpacing = 6; // Fixed spacing for text sampling
 
         let gridCols, gridRows;
         let grid = new Map();
@@ -825,10 +824,10 @@
             return points;
         }
 
-        function regenerateTargets() {
-            // Re-sample text with current spacing
+        function createNodes() {
+            // Generate target positions from text
             const fontSize = Math.min(width * 0.15, 200);
-            const textPoints = getTextPoints('david', fontSize, currentSpacing);
+            const textPoints = getTextPoints('david', fontSize, textSpacing);
 
             const centerX = width / 2;
             const centerY = height / 2;
@@ -838,25 +837,15 @@
                 y: centerY + p.y
             }));
 
-            return targetPositions;
-        }
-
-        function createNodes() {
-            // Generate initial targets
-            regenerateTargets();
-
-            // Create nodes with targets
+            // Create nodes with targets - START RANDOMLY SCATTERED
             nodes = [];
 
             for (let i = 0; i < targetPositions.length; i++) {
-                const target = targetPositions[i];
-
-                // Start nodes AT their target positions (calm on load)
                 nodes.push({
-                    x: target.x + (Math.random() - 0.5) * 5,
-                    y: target.y + (Math.random() - 0.5) * 5,
-                    vx: 0,
-                    vy: 0,
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    vx: (Math.random() - 0.5) * 1,
+                    vy: (Math.random() - 0.5) * 1,
                     radius: Math.random() * 2 + 1.5,
                     color: nodeColors[Math.floor(Math.random() * nodeColors.length)],
                     targetIndex: i
@@ -864,13 +853,13 @@
             }
 
             // Add some extra floating particles without targets
-            const extraCount = 15;
+            const extraCount = 20;
             for (let i = 0; i < extraCount; i++) {
                 nodes.push({
                     x: Math.random() * width,
                     y: Math.random() * height,
-                    vx: (Math.random() - 0.5) * 0.3,
-                    vy: (Math.random() - 0.5) * 0.3,
+                    vx: (Math.random() - 0.5) * 0.5,
+                    vy: (Math.random() - 0.5) * 0.5,
                     radius: Math.random() * 1.5 + 0.5,
                     color: nodeColors[Math.floor(Math.random() * nodeColors.length)],
                     targetIndex: -1 // No target, just floats
@@ -879,33 +868,7 @@
         }
 
         function spawnNodes(x, y, count = 5) {
-            // Increase resolution: decrease spacing, regenerate targets
-            if (currentSpacing > minSpacing) {
-                currentSpacing = Math.max(minSpacing, currentSpacing - 0.5);
-                const oldTargetCount = targetPositions.length;
-                regenerateTargets();
-
-                // Reassign existing nodes to nearest new targets
-                for (const node of nodes) {
-                    if (node.targetIndex >= 0) {
-                        // Find nearest target
-                        let nearestIdx = 0;
-                        let nearestDistSq = Infinity;
-                        for (let t = 0; t < targetPositions.length; t++) {
-                            const dx = node.x - targetPositions[t].x;
-                            const dy = node.y - targetPositions[t].y;
-                            const distSq = dx * dx + dy * dy;
-                            if (distSq < nearestDistSq) {
-                                nearestDistSq = distSq;
-                                nearestIdx = t;
-                            }
-                        }
-                        node.targetIndex = nearestIdx;
-                    }
-                }
-            }
-
-            // Spawn new particles aimed at new target positions
+            // Spawn new particles that flow toward random targets
             for (let i = 0; i < count; i++) {
                 const angle = (Math.PI * 2 / count) * i;
                 const speed = 3 + Math.random() * 2;
