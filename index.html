@@ -760,24 +760,28 @@
     </footer>
 
     <script>
-        // Interactive Node Graph Canvas with Spatial Hashing
-        // O(n²) -> O(n * k) where k = avg nodes per cell neighborhood
+        // Interactive Node Graph Canvas with Flow Matching
+        // Particles flow toward target positions that form artwork
         const canvas = document.getElementById('hero-canvas');
         const ctx = canvas.getContext('2d');
 
         let width, height;
         let nodes = [];
+        let targetPositions = [];
         let mouse = { x: null, y: null, radius: 150 };
         let isAttracting = false;
+        let isScattered = false;
+        let lastInteraction = 0;
+        const reformDelay = 1500; // ms before particles start reforming
 
-        const nodeCount = 150;
         const connectionDistance = 120;
         const cellSize = connectionDistance;
-        const maxConnectionsPerNode = 6; // Cap edges per node for O(n * min(k, maxConn))
+        const maxConnectionsPerNode = 6;
         const nodeColors = ['#d4c6e7', '#f2d7d9', '#b8d4e3', '#fce5d8', '#c9e4de'];
+        const flowStrength = 0.02; // How strongly particles are pulled to targets
 
         let gridCols, gridRows;
-        let grid = new Map(); // Spatial hash: "col,row" -> [node indices]
+        let grid = new Map();
 
         function resize() {
             width = canvas.width = window.innerWidth;
@@ -786,16 +790,85 @@
             gridRows = Math.ceil(height / cellSize);
         }
 
+        // Sample points from text to create target positions
+        function getTextPoints(text, fontSize, spacing = 4) {
+            const offscreen = document.createElement('canvas');
+            const offCtx = offscreen.getContext('2d');
+
+            offCtx.font = `bold ${fontSize}px Inter, sans-serif`;
+            const metrics = offCtx.measureText(text);
+            const textWidth = metrics.width;
+            const textHeight = fontSize;
+
+            offscreen.width = textWidth + 20;
+            offscreen.height = textHeight + 20;
+
+            offCtx.font = `bold ${fontSize}px Inter, sans-serif`;
+            offCtx.fillStyle = 'white';
+            offCtx.fillText(text, 10, fontSize);
+
+            const imageData = offCtx.getImageData(0, 0, offscreen.width, offscreen.height);
+            const points = [];
+
+            // Sample points where text pixels exist
+            for (let y = 0; y < offscreen.height; y += spacing) {
+                for (let x = 0; x < offscreen.width; x += spacing) {
+                    const i = (y * offscreen.width + x) * 4;
+                    if (imageData.data[i + 3] > 128) { // Alpha > 128
+                        points.push({
+                            x: x - offscreen.width / 2,
+                            y: y - textHeight / 2
+                        });
+                    }
+                }
+            }
+
+            return points;
+        }
+
         function createNodes() {
+            // Generate target positions from text
+            const fontSize = Math.min(width * 0.15, 200);
+            const textPoints = getTextPoints('david', fontSize, 5);
+
+            // Center offset
+            const centerX = width / 2;
+            const centerY = height / 2;
+
+            // Create nodes with targets
             nodes = [];
-            for (let i = 0; i < nodeCount; i++) {
+            targetPositions = [];
+
+            for (let i = 0; i < textPoints.length; i++) {
+                const target = {
+                    x: centerX + textPoints[i].x,
+                    y: centerY + textPoints[i].y
+                };
+                targetPositions.push(target);
+
+                // Start nodes scattered randomly
+                nodes.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    vx: (Math.random() - 0.5) * 2,
+                    vy: (Math.random() - 0.5) * 2,
+                    radius: Math.random() * 2 + 1.5,
+                    color: nodeColors[Math.floor(Math.random() * nodeColors.length)],
+                    targetIndex: i
+                });
+            }
+
+            // Add some extra floating particles without targets
+            const extraCount = 50;
+            for (let i = 0; i < extraCount; i++) {
                 nodes.push({
                     x: Math.random() * width,
                     y: Math.random() * height,
                     vx: (Math.random() - 0.5) * 0.5,
                     vy: (Math.random() - 0.5) * 0.5,
-                    radius: Math.random() * 2 + 1,
-                    color: nodeColors[Math.floor(Math.random() * nodeColors.length)]
+                    radius: Math.random() * 1.5 + 0.5,
+                    color: nodeColors[Math.floor(Math.random() * nodeColors.length)],
+                    targetIndex: -1 // No target, just floats
                 });
             }
         }
@@ -810,7 +883,8 @@
                     vx: Math.cos(angle) * speed,
                     vy: Math.sin(angle) * speed,
                     radius: Math.random() * 2 + 1,
-                    color: nodeColors[Math.floor(Math.random() * nodeColors.length)]
+                    color: nodeColors[Math.floor(Math.random() * nodeColors.length)],
+                    targetIndex: -1
                 });
             }
         }
@@ -853,6 +927,9 @@
             // Build spatial hash once per frame - O(n)
             buildSpatialHash();
 
+            const now = Date.now();
+            const shouldReform = now - lastInteraction > reformDelay;
+
             // Update and draw nodes
             for (let i = 0; i < nodes.length; i++) {
                 const node = nodes[i];
@@ -870,18 +947,36 @@
                         const direction = isAttracting ? -1 : 1;
                         node.vx += (dx / dist) * force * 0.5 * direction;
                         node.vy += (dy / dist) * force * 0.5 * direction;
+                        lastInteraction = now;
+                    }
+                }
+
+                // Flow matching: pull toward target position
+                if (node.targetIndex >= 0 && shouldReform) {
+                    const target = targetPositions[node.targetIndex];
+                    if (target) {
+                        const dx = target.x - node.x;
+                        const dy = target.y - node.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+
+                        if (dist > 1) {
+                            // Smooth flow toward target
+                            node.vx += dx * flowStrength;
+                            node.vy += dy * flowStrength;
+                        }
                     }
                 }
 
                 // Apply velocity with damping
                 node.x += node.vx;
                 node.y += node.vy;
-                node.vx *= 0.99;
-                node.vy *= 0.99;
+                node.vx *= 0.95; // Stronger damping for smoother flow
+                node.vy *= 0.95;
 
-                // Add slight random movement
-                node.vx += (Math.random() - 0.5) * 0.05;
-                node.vy += (Math.random() - 0.5) * 0.05;
+                // Add slight random movement (less when reforming)
+                const jitter = shouldReform && node.targetIndex >= 0 ? 0.01 : 0.05;
+                node.vx += (Math.random() - 0.5) * jitter;
+                node.vy += (Math.random() - 0.5) * jitter;
 
                 // Bounce off edges
                 if (node.x < 0 || node.x > width) node.vx *= -1;
