@@ -923,11 +923,7 @@
                 ctx.fill();
             }
 
-            // Limit max nodes for performance
-            if (nodes.length > 500) {
-                nodes = nodes.slice(-500);
-            }
-
+           
             requestAnimationFrame(animate);
         }
 
