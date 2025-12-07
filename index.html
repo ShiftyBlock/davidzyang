@@ -760,22 +760,29 @@
     </footer>
 
     <script>
-        // Interactive Node Graph Canvas
+        // Interactive Node Graph Canvas with Spatial Hashing
+        // O(n²) -> O(n * k) where k = avg nodes per cell neighborhood
         const canvas = document.getElementById('hero-canvas');
         const ctx = canvas.getContext('2d');
 
         let width, height;
         let nodes = [];
         let mouse = { x: null, y: null, radius: 150 };
-        let isAttracting = false; // Shift or right-click to attract
+        let isAttracting = false;
 
-        const nodeCount = 80;
+        const nodeCount = 150; // Can handle more nodes now!
         const connectionDistance = 120;
+        const cellSize = connectionDistance; // Grid cell = connection range
         const nodeColors = ['#d4c6e7', '#f2d7d9', '#b8d4e3', '#fce5d8', '#c9e4de'];
+
+        let gridCols, gridRows;
+        let grid = new Map(); // Spatial hash: "col,row" -> [node indices]
 
         function resize() {
             width = canvas.width = window.innerWidth;
             height = canvas.height = window.innerHeight;
+            gridCols = Math.ceil(width / cellSize);
+            gridRows = Math.ceil(height / cellSize);
         }
 
         function createNodes() {
@@ -807,20 +814,62 @@
             }
         }
 
+        function getCellKey(x, y) {
+            const col = Math.floor(x / cellSize);
+            const row = Math.floor(y / cellSize);
+            return `${col},${row}`;
+        }
+
+        function buildSpatialHash() {
+            grid.clear();
+            for (let i = 0; i < nodes.length; i++) {
+                const key = getCellKey(nodes[i].x, nodes[i].y);
+                if (!grid.has(key)) grid.set(key, []);
+                grid.get(key).push(i);
+            }
+        }
+
+        function getNeighborIndices(node) {
+            const col = Math.floor(node.x / cellSize);
+            const row = Math.floor(node.y / cellSize);
+            const neighbors = [];
+
+            // Check 3x3 neighborhood (9 cells)
+            for (let dc = -1; dc <= 1; dc++) {
+                for (let dr = -1; dr <= 1; dr++) {
+                    const key = `${col + dc},${row + dr}`;
+                    if (grid.has(key)) {
+                        neighbors.push(...grid.get(key));
+                    }
+                }
+            }
+            return neighbors;
+        }
+
         function animate() {
             ctx.clearRect(0, 0, width, height);
 
+            // Build spatial hash once per frame - O(n)
+            buildSpatialHash();
+
+            // Track drawn connections to avoid duplicates
+            const drawnConnections = new Set();
+
             // Update and draw nodes
-            nodes.forEach((node, i) => {
+            for (let i = 0; i < nodes.length; i++) {
+                const node = nodes[i];
+
                 // Mouse interaction - repel or attract
                 if (mouse.x && mouse.y) {
                     const dx = node.x - mouse.x;
                     const dy = node.y - mouse.y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    const distSq = dx * dx + dy * dy;
+                    const radiusSq = mouse.radius * mouse.radius;
 
-                    if (dist < mouse.radius && dist > 0) {
+                    if (distSq < radiusSq && distSq > 0) {
+                        const dist = Math.sqrt(distSq);
                         const force = (mouse.radius - dist) / mouse.radius;
-                        const direction = isAttracting ? -1 : 1; // -1 attracts, 1 repels
+                        const direction = isAttracting ? -1 : 1;
                         node.vx += (dx / dist) * force * 0.5 * direction;
                         node.vy += (dy / dist) * force * 0.5 * direction;
                     }
@@ -844,14 +893,19 @@
                 node.x = Math.max(0, Math.min(width, node.x));
                 node.y = Math.max(0, Math.min(height, node.y));
 
-                // Draw connections
-                for (let j = i + 1; j < nodes.length; j++) {
+                // Draw connections only to nearby nodes - O(k) instead of O(n)
+                const neighbors = getNeighborIndices(node);
+                for (const j of neighbors) {
+                    if (j <= i) continue; // Avoid duplicate connections
+
                     const other = nodes[j];
                     const dx = node.x - other.x;
                     const dy = node.y - other.y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    const distSq = dx * dx + dy * dy;
+                    const connDistSq = connectionDistance * connectionDistance;
 
-                    if (dist < connectionDistance) {
+                    if (distSq < connDistSq) {
+                        const dist = Math.sqrt(distSq);
                         const opacity = (1 - dist / connectionDistance) * 0.3;
                         ctx.beginPath();
                         ctx.strokeStyle = `rgba(212, 198, 231, ${opacity})`;
@@ -867,9 +921,12 @@
                 ctx.fillStyle = node.color;
                 ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
                 ctx.fill();
-            });
+            }
 
-        
+            // Limit max nodes for performance
+            if (nodes.length > 500) {
+                nodes = nodes.slice(-500);
+            }
 
             requestAnimationFrame(animate);
         }
@@ -896,7 +953,7 @@
         });
 
         canvas.addEventListener('mousedown', (e) => {
-            if (e.button === 2) { // Right click
+            if (e.button === 2) {
                 isAttracting = true;
             }
         });
